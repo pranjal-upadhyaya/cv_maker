@@ -71,11 +71,18 @@ class SideBySideFlowable(Flowable):
         return availWidth, max(left_h, right_h)
     
     def draw(self):
-        # Draw left content at bottom-left
-        self.left_content.drawOn(self.canv, 0, 0)
+        # Calculate the total height of this flowable
+        total_height = max(self.left_h, self.right_h)
         
-        # Draw right content at bottom-right, aligned to same baseline
-        self.right_content.drawOn(self.canv, self.left_width, 0)
+        # Calculate vertical offsets to center each content
+        left_y_offset = (total_height - self.left_h) / 2
+        right_y_offset = (total_height - self.right_h) / 2
+        
+        # Draw left content centered vertically
+        self.left_content.drawOn(self.canv, 0, left_y_offset)
+        
+        # Draw right content centered vertically
+        self.right_content.drawOn(self.canv, self.left_width, right_y_offset)
 
 def create_side_by_side_headers(left_text, right_text, left_style, right_style, left_width_ratio=0.5):
     """
@@ -346,7 +353,6 @@ def create_pdf():
 
     astuto_data_engineer_experience = [
         "Developed and maintained 100+ APIs, contributing extensively to API development initiatives.",
-        "Managed and optimized API microservices architecture to ensure high performance and scalability.",
         "Designed, built, and maintained multiple scalable data pipelines using Dagster, ingesting and processing multiple terabytes of data on a daily basis.",
         "Worked extensively with PostgreSQL and ClickHouse databases, overseeing database maintenance and optimization.",
         "Utilized database systems for advanced data analysis to support business decision-making.",
@@ -383,16 +389,21 @@ def create_pdf():
         create_hyperlink("https://github.com/pranjal-upadhyaya", "github.com/pranjal-upadhyaya", "blue"),
     ]
 
-    technical_skills = [
-        "Python",
-        "SQL",
-        "Docker",
-        "AWS",
-        "Git",
-        "CI/CD",
-        "Data Pipelines",
-        "ETL",
-        "API Development",
+    technical_skills = {
+        "Python": "Pandas, NumPy, SQLAlchemy, Flask, FastAPI, Selenium",
+        "Databases": "PostgreSQL, ClickHouse, MSSQL, MySQL",
+        "Cloud": "AWS (EC2, S3, RDS, EBS, ELB, ECS)",
+        "Data Engineering": "Dagster, ETL, Data Pipelines",
+        "DevOps/Tools": "Docker, Kubernetes, Git, CI/CD"
+    }
+
+    soft_skills = [
+        f"<b>Team Management</b>: Effectively coordinate and motivate team members to achieve project objectives and maintain high productivity.",
+        f"<b>Leadership</b>: Guide teams through complex challenges, fostering a collaborative and innovative work environment.",
+        f"<b>Problem Solving</b>: Approach technical and operational issues analytically to develop efficient, scalable solutions.",
+        f"<b>Communication</b>: Clearly convey technical concepts to both technical and non-technical stakeholders, ensuring alignment and understanding.",
+        f"<b>Project Management</b>: Plan, organize, and oversee project execution to ensure timely delivery and quality outcomes.",
+        f"<b>Documentation</b>: Maintain comprehensive and clear documentation to support ongoing development, knowledge sharing, and process improvement.",
     ]
     
     # story.append(NextFrameFlowable(2))
@@ -425,8 +436,8 @@ def create_pdf():
     story.append(Spacer(1, 6, isGlue=True))
     story.append(create_body("Bangalore, Karnataka, India"))
     story.append(Spacer(1, 6, isGlue=True))
-    story.append(create_header("Permanent Address", "body_style_bold"))
-    story.append(Spacer(1, 6, isGlue=True))
+    # story.append(create_header("Permanent Address", "body_style_bold"))
+    # story.append(Spacer(1, 6, isGlue=True))
     story.append(create_body("Renukoot, Uttar Pradesh, India"))
     story.append(Spacer(1, 6, isGlue=True))
     story.append(create_header("Phone", "body_style_bold"))
@@ -447,14 +458,16 @@ def create_pdf():
     story.append(create_line(x=0, y=0, width=180))
     story.append(Spacer(1, 6, isGlue=True))
     for skill in technical_skills:
-        story.append(create_body(skill))
-        story.append(Spacer(1, 6, isGlue=True))
+        story.append(create_side_by_side_headers(skill, technical_skills[skill], "body_style_bold", "body_style"))
+        story.append(Spacer(1, 8, isGlue=True))
 
     # Next Page
 
     story.append(NextPageTemplate(1))
     story.append(PageBreak())
     story.append(create_header("Experience", "header3_style"))
+    story.append(Spacer(1, 12, isGlue=True))
+    story.append(create_line(x=0, y=0, width=384))
     story.append(Spacer(1, 12, isGlue=True))
     story.append(create_header("Data Engineer (July 2022-March 2024)", "header4_style"))
     story.append(Spacer(1, 6, isGlue=True))
@@ -494,7 +507,27 @@ def create_pdf():
     story.append(create_body("Bhavan's K.D.K.V.M, Renukoot"))
     story.append(Spacer(1, 6, isGlue=True))
     story.append(create_body_dim("2013-2015"))
+    story.append(Spacer(1, 12, isGlue=True))
+
+    story.append(create_header("Soft Skills", "header3_style"))
+    story.append(Spacer(1, 12, isGlue=True))
+    story.append(create_line(x=0, y=0, width=384))
+    story.append(Spacer(1, 12, isGlue=True))
+    for skill in soft_skills:
+        story.append(create_bullet_point(skill))
+        story.append(Spacer(1, 6, isGlue=True))
+
+    story.append(NextFrameFlowable(1))
+    story.append(FrameBreak())
+    story.append(create_header("Achievements", "header3_style"))
+    story.append(Spacer(1, 12, isGlue=True))
+    story.append(create_line(x=0, y=0, width=384))
+    story.append(Spacer(1, 12, isGlue=True))
+    story.append(create_bullet_point("JEST: Qualified Joint Entrance Screening Test with AIR 146 in 2022"))
     story.append(Spacer(1, 6, isGlue=True))
+    story.append(create_bullet_point("Inspire Fellow: 2015-2020"))
+    story.append(Spacer(1, 6, isGlue=True))
+    
 
     doc.build(story)
 
