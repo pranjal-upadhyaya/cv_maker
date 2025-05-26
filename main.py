@@ -336,7 +336,7 @@ def create_pdf():
     story.append(designation)
     story.append(NextFrameFlowable(1))
     story.append(FrameBreak())
-    story.append(create_body("Experienced Data Engineer with a strong proficiency in Python and SQL, specializing in database management, data pipeline creation, and API development. Skilled at designing, constructing, and optimizing robust data processing systems to ensure efficient data flow and accessibility. Demonstrated expertise in building scalable ETL pipelines, managing complex SQL databases, and developing APIs to support seamless data integration across platforms. Adept at collaborating with cross-functional teams to deliver high-quality, reliable data solutions that drive business insights and operational efficiency"))
+    story.append(create_body("Results-oriented Data Engineer with nearly 3 years of experience designing, building, and optimizing large-scale data systems in cloud environments. Highly proficient in Python, SQL, and AWS, with hands-on expertise in developing robust APIs, architecting microservices, and creating scalable data pipelines that process multi-terabyte datasets daily. Demonstrated success in database optimization, achieving significant performance and storage improvements, and leading cross-functional teams to deliver high-impact solutions. Adept at leveraging advanced ETL frameworks, modern cloud platforms, and best engineering practices to drive data-driven decision-making and business value."))
     story.append(Spacer(1, 24, isGlue=True))
     # story.append(FrameBreak())
     
