@@ -1,5 +1,5 @@
 from reportlab.pdfgen.canvas import Canvas
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Frame, PageTemplate, NextPageTemplate, NextFrameFlowable, PageBreak, FrameBreak, Spacer, Flowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Frame, PageTemplate, NextPageTemplate, NextFrameFlowable, PageBreak, FrameBreak, Spacer, Flowable, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
@@ -327,6 +327,42 @@ def create_bullet_point(text: str):
     bullet_point = Paragraph(text = text, bulletText = "•", style=style)
     return bullet_point
 
+def create_image(image_path: str, align: str, width: int, height: int, preserve_aspect_ratio: bool = True):
+    """
+    Create an image flowable with specified dimensions
+    
+    Args:
+        image_path: Path to the image file
+        width: Desired width in points (1/72 inch). If None, uses original image width
+        height: Desired height in points (1/72 inch). If None, uses original image height
+        preserve_aspect_ratio: If True, maintains image aspect ratio when scaling
+    
+    Returns:
+        Image flowable that can be added to the story
+    """
+    img = Image(image_path)
+    if align == "left":
+        img.hAlign = "LEFT"
+    elif align == "center":
+        img.hAlign = "CENTER"
+    elif align == "right":
+        img.hAlign = "RIGHT"
+    if preserve_aspect_ratio:
+            # Use the more constraining dimension
+            w_ratio = width / img.imageWidth
+            h_ratio = height / img.imageHeight
+            ratio = min(w_ratio, h_ratio)
+            img.drawWidth = img.imageWidth * ratio
+            img.drawHeight = img.imageHeight * ratio
+    else:
+        # Set exact dimensions
+        if width is not None:
+            img.drawWidth = width
+        if height is not None:
+            img.drawHeight = height
+    
+    return img
+
 def create_pdf():
     doc = SimpleDocTemplate("output.pdf", pagesize=letter)
     template = create_template()
@@ -428,6 +464,7 @@ def create_pdf():
     
     story.append(NextFrameFlowable(2))
     story.append(FrameBreak())
+    story.append(create_image("assets/PersonalImage.png", "left", 150, 150, preserve_aspect_ratio=True))
     story.append(create_header("Personal Information", "header4_style"))
     story.append(Spacer(1, 6, isGlue=True))
     story.append(create_line(x=0, y=0, width=180))
@@ -436,8 +473,8 @@ def create_pdf():
     story.append(Spacer(1, 6, isGlue=True))
     story.append(create_body("Bangalore, Karnataka, India"))
     story.append(Spacer(1, 6, isGlue=True))
-    # story.append(create_header("Permanent Address", "body_style_bold"))
-    # story.append(Spacer(1, 6, isGlue=True))
+    story.append(create_header("Permanent Address", "body_style_bold"))
+    story.append(Spacer(1, 6, isGlue=True))
     story.append(create_body("Renukoot, Uttar Pradesh, India"))
     story.append(Spacer(1, 6, isGlue=True))
     story.append(create_header("Phone", "body_style_bold"))
