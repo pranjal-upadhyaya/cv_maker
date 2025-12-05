@@ -3,6 +3,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Frame, PageTemplate
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
+from PyPDF2 import PdfReader, PdfWriter
 
 
 
@@ -363,6 +364,27 @@ def create_image(image_path: str, align: str, width: int, height: int, preserve_
     
     return img
 
+def compress_pdf(input_path: str, output_path: str = None):
+    """
+    Compress the PDF file by rewriting it (PyPDF2 does basic compression).
+    Args:
+        input_path: Path to input PDF file
+        output_path: Path to save compressed PDF file. If None, will append '_compressed' to input filename
+    """
+    if output_path is None:
+        name_parts = input_path.rsplit('.', 1)
+        output_path = f"{name_parts[0]}_compressed.{name_parts[1]}"
+    
+    reader = PdfReader(input_path)
+    writer = PdfWriter()
+    
+    for page in reader.pages:
+        writer.add_page(page)
+    
+    # Save compressed file
+    with open(output_path, 'wb') as output_file:
+        writer.write(output_file)
+
 def create_pdf():
     doc = SimpleDocTemplate("output.pdf", pagesize=letter)
     template = create_template()
@@ -379,7 +401,7 @@ def create_pdf():
     story.append(designation)
     story.append(NextFrameFlowable(1))
     story.append(FrameBreak())
-    story.append(create_body("Results-oriented Data Engineer with nearly 3 years of experience designing, building, and optimizing large-scale data systems in cloud environments. Highly proficient in Python, SQL, and AWS, with hands-on expertise in developing robust APIs, architecting microservices, and creating scalable data pipelines that process multi-terabyte datasets daily. Demonstrated success in database optimization, achieving significant performance and storage improvements, and leading cross-functional teams to deliver high-impact solutions. Adept at leveraging advanced ETL frameworks, modern cloud platforms, and best engineering practices to drive data-driven decision-making and business value."))
+    story.append(create_body("Results-oriented Data Engineer with 3.5 years of experience designing, building, and optimizing large-scale data systems in cloud environments. Highly proficient in Python, SQL and AWS with hands-on expertise in developing robust APIs, architecting microservices, and creating scalable data pipelines that process multi-terabyte datasets daily. Demonstrated success in database optimization, achieving significant performance and storage improvements and leading cross-functional teams to deliver high-impact solutions. Adept at leveraging advanced ETL frameworks, modern cloud platforms, and best engineering practices to drive data-driven decision-making."))
     story.append(Spacer(1, 24, isGlue=True))
     # story.append(FrameBreak())
     
@@ -391,12 +413,11 @@ def create_pdf():
         "Developed and maintained 100+ APIs, contributing extensively to API development initiatives.",
         "Designed, built, and maintained multiple scalable data pipelines using Dagster, ingesting and processing multiple terabytes of data on a daily basis.",
         "Worked extensively with PostgreSQL and ClickHouse databases, overseeing database maintenance and optimization.",
-        "Utilized database systems for advanced data analysis to support business decision-making.",
+        "Performed regular data analysis to support business side decision making.",
+        "Created data pipeline analysis mechanism to optimize pipeline costs reducing runtime and storage and bringing down monthly pipeline costs by $100",
         "Gained extensive hands-on experience with AWS, deploying and maintaining cloud resources to ensure secure, scalable, and reliable infrastructure.",
         "Led end-to-end development of high-volume data pipelines to ingest and transform AWS Cost and Usage Reports (CUR), analyzing and processing multi-terabyte datasets for storage in PostgreSQL and ClickHouse databases.",
         "Optimized database performance through partitioning, indexing, and distributed processing strategies to efficiently handle massive data loads.",
-        "Designed and implemented fault-tolerant ETL workflows using Dagster, ensuring data integrity across a microservices architecture.",
-        "Developed the entire API infrastructure for fetching multi-terabyte AWS CUR data stored in PostgreSQL and ClickHouse databases.",
         "Optimized large customer-facing APIs to achieve response times of less than 100 milliseconds by implementing advanced query optimization techniques and strategic indexing on frequently queried database columns.",
         "Led the end-to-end development of cloud cost calculation modules, overseeing both data pipeline and API development and maintenance, and managed a team of 4 developers to deliver robust, scalable solutions for accurate cloud cost analytics.",
         "Collaborated as part of a four-member team to optimize database systems, achieving a 75% reduction in database size through data migration, targeted data deletion, and API modifications for compatibility with the streamlined data structure.",
@@ -567,6 +588,9 @@ def create_pdf():
     
 
     doc.build(story)
+    
+    # Compress the generated PDF
+    compress_pdf("output.pdf")
 
 
 if __name__ == "__main__":
